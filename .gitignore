@@ -1,0 +1,10 @@
+# 모든 CSV 파일 제외
+*.csv
+
+# 아래 디렉터리 제외하고 (source, landing, target 폴더)
+source/
+landing/
+target/
+
+# pycache 제외
+__pycache__

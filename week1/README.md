@@ -1,17 +1,25 @@
 # Week 1. ETL (Extract, Load, Transform)
 
-## 1. 파일 설명
-- extract_and_load.py 
-    - 데이터를 추출하여 landing에 적재
-- transform.py
-    - landing에 있는 데이터를 변환하여 target에 적재
+## 1. 주제
+- 날씨 더미데이터를 생성하여 겨울철 체감온도를 구하는 ELT 로직 구현
+
+## 2. 파일 설명
+- elt.py 
+    - 데이터를 추출, 적재, 변환하는 작업 로직 구현
+- main.py
+    - main이 되는 python 파일
+- source
+    - 소스가 될 데이터파일이 위치한 곳 (더미 데이터 csv 파일을 생성하여 사용)
 - landing 
     - extract_and_load.py의 결과 데이터를 적재
 - target 
     - transform.py의 결과 데이터를 적재
 
 
-## 2. 프로세스 순서
+## 3. 프로세스 순서
 
-1) extract_and_load.py (추출)
-2) transform.py (변환)
+1) main.py (메인으로 진행되는 함수)
+2) elt.py (추출, 적재, 변환 작업을 진행하는 함수)
+  - extract() : 더미 데이터 csv를 생성
+  - load() : 생성한 csv를 landing 디렉터리에 임시 적재
+  - transform() : landing 디렉터리에 담긴 csv를 읽어 변환 작업 진행 후, target 디렉토리에 최종 적재
