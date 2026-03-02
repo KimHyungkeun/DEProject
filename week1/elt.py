@@ -92,7 +92,6 @@ class ELTClass :
         print("landing 폴더 정리가 완료되었습니다.")
     
     # landing zone의 내용을 읽어 변환하여 target 디렉터리에 최종 적재
-    # 겨울철 체감온도를 구하는 공식
     def transform(self) :
         os.makedirs(self.target_dir, exist_ok=True)
         # 중요: load()에서 파일을 옮겼으므로 landing_dir를 탐색해야 합니다.
