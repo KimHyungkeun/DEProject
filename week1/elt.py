@@ -122,6 +122,8 @@ class ELTClass :
                     # 계절별 계산 분기
                     if 10 <= month or month <= 4: 
                         at = self._calculate_winter_chill(temp, wind)
+                    else :
+                        at = temp
                     
                     status = self._get_weather_status(at, month)
 
