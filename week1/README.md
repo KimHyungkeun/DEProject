@@ -2,7 +2,7 @@
 
 ## 1. 주제
 - 날씨 더미데이터를 생성하여 겨울철 체감온도를 구하는 ELT 로직 구현
-- 크게 Normal(정상), Coldwave Warning(한파 주의보), Coldwave Advisory(한파 경보)
+- 크게 Normal(정상), Coldwave Advisory(한파 주의보), Coldwave Warning(한파 경보)
 
 ## 2. 파일 설명
 - elt.py 
@@ -26,3 +26,4 @@
   - transform() : landing 디렉터리에 담긴 csv를 읽어 변환 작업 진행 후, target 디렉토리에 최종 적재
 
 ## 4. 프로세스 도식화
+![alt text](img/week1_elt.jpg)
