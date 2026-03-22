@@ -15,6 +15,8 @@
     - extract_and_load.py의 결과 데이터를 적재
 - staging
     - transform.py의 결과 데이터를 적재
+- sql
+    - DB에 질의할 sql 파일 모음 폴더
 
 
 ## 3. 프로세스 순서
