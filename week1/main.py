@@ -11,7 +11,7 @@ def main() :
     # 추출한 데이터를 landing에 적재
     instance_elt.load()
 
-    # landing에서 데이터를 읽어와 mart에 최종 적재
+    # landing에서 데이터를 읽어와 source에 최종 적재
     instance_elt.transform()
 
 if __name__ == '__main__' :

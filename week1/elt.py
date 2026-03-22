@@ -4,10 +4,22 @@ import os
 from datetime import datetime, timedelta
 import shutil
 import glob
+import pandas as pd
+import psycopg2
+from psycopg2.extras import execute_values
 
 # 설정
 TOTAL_FILES = 10
 ROWS_PER_FILE = 100_000 
+
+# --- 사용 예시 ---
+db_config = {
+    "host": "localhost",
+    "database": "postgres",
+    "user": "postgres",
+    "password": "postgres",
+    "port": 5432
+}
 
 
 class ELTClass :
@@ -131,7 +143,66 @@ class ELTClass :
                     row['weather_status'] = status
                     writer.writerow(row)
 
+            self._upsert_weather_from_csv(staging_path)
             print(f"성공: {file_path} -> {os.path.basename(staging_path)}")
+
 
         # --- 파일 삭제 로직 추가 ---
         self._cleanup_landing_zone(files)
+
+    # staging_zone의 내용을 sql에 insert
+    def _upsert_weather_from_csv(self, staging_path):
+        """
+        1. 지정된 SQL 파일을 실행 (전처리)
+        2. CSV 파일을 읽어 PostgreSQL 테이블에 Upsert 수행
+        """
+        sql_file_path = "sql/transformed_weather.sql"
+        conn = None
+
+        try:
+            conn = psycopg2.connect(**db_config)
+            curr = conn.cursor()
+
+            # 1. SQL 실행 (테이블이 없으면 생성하는 용도 등)
+            if os.path.exists(sql_file_path):
+                with open(sql_file_path, 'r', encoding='utf-8') as f:
+                    curr.execute(f.read())
+
+            # 2. 데이터 로드 (중복 제거 로직 삭제)
+            df = pd.read_csv(staging_path)
+            
+            # NaN 처리 (NULL 값 입력 보장)
+            df = df.where(pd.notnull(df), None)
+            
+            columns = df.columns.tolist()
+            values = [tuple(x) for x in df.to_numpy()]
+
+            # 3. 쿼리 구성 (ON CONFLICT 제거, 단순 INSERT)
+            # CSV에 id가 있다면 제외 (DB SERIAL 자동 생성을 위함)
+            if 'id' in columns:
+                idx = columns.index('id')
+                columns.pop(idx)
+                values = [v[:idx] + v[idx+1:] for v in values]
+            
+            # 단순 INSERT 쿼리
+            insert_query = f"""
+                INSERT INTO public.weather_data ({", ".join(columns)})
+                VALUES %s;
+            """
+
+            print(f"Executing INSERT for {len(values)} rows from {os.path.basename(staging_path)}...")
+            
+            # 10만 건이므로 성능을 위해 execute_values 사용
+            execute_values(curr, insert_query, values)
+            
+            conn.commit()
+            print("Success: Data inserted successfully.")
+
+        except Exception as e:
+            if conn: 
+                conn.rollback()
+            print(f"Error during INSERT: {e}")
+        finally:
+            if conn: 
+                conn.close()
+        
