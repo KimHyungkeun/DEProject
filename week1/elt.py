@@ -14,7 +14,7 @@ class ELTClass :
     def __init__(self):
         self.source_dir = 'source/csv'
         self.landing_dir = 'landing'
-        self.target_dir = 'target'
+        self.staging_dir = 'staging'
 
     # 파일 추출
     def extract(self) :
@@ -91,9 +91,9 @@ class ELTClass :
                 print(f"파일 삭제 실패 ({file_path}): {e}")
         print("landing 폴더 정리가 완료되었습니다.")
     
-    # landing zone의 내용을 읽어 변환하여 target 디렉터리에 최종 적재
+    # landing zone의 내용을 읽어 변환하여 staging 디렉터리에 최종 적재
     def transform(self) :
-        os.makedirs(self.target_dir, exist_ok=True)
+        os.makedirs(self.staging_dir, exist_ok=True)
         # 중요: load()에서 파일을 옮겼으므로 landing_dir를 탐색해야 합니다.
         files = glob.glob(f"{self.landing_dir}/*.csv")
 
@@ -102,10 +102,10 @@ class ELTClass :
             return
 
         for file_path in files:
-            target_path = os.path.join(self.target_dir, f"transformed_{os.path.basename(file_path)}")
+            staging_path = os.path.join(self.staging_dir, f"transformed_{os.path.basename(file_path)}")
 
             with open(file_path, 'r', encoding='utf-8') as f_in, \
-                 open(target_path, 'w', newline='', encoding='utf-8') as f_out:
+                 open(staging_path, 'w', newline='', encoding='utf-8') as f_out:
                 
                 reader = csv.DictReader(f_in)
                 writer = csv.DictWriter(f_out, fieldnames=reader.fieldnames + ['apparent_temp', 'weather_status'])
@@ -131,7 +131,7 @@ class ELTClass :
                     row['weather_status'] = status
                     writer.writerow(row)
 
-            print(f"성공: {file_path} -> {os.path.basename(target_path)}")
+            print(f"성공: {file_path} -> {os.path.basename(staging_path)}")
 
         # --- 파일 삭제 로직 추가 ---
         self._cleanup_landing_zone(files)

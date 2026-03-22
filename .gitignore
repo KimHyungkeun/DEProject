@@ -4,7 +4,7 @@
 # 아래 디렉터리 제외하고 (source, landing, target 폴더)
 source/
 landing/
-target/
+staging/
 
 # pycache 제외
 __pycache__
