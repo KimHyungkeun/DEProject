@@ -72,7 +72,8 @@ class ELTClass :
 
     # 10월~4월용 겨울 체감온도 (풍속 반영)
     # 미국·캐나다 공동 개발 신 바람냉각지수(2001), 기상청 공식 채택
-    # 출처 : https://www.weather.go.kr/w/forecast/life/life-weather-index.do
+    # 출처 : https://data.kma.go.kr/climate/windChill/selectWindChillChart.do
+    
     def _calculate_winter_chill(self, temp, wind_speed):
         # 풍속 단위 변환: m/s -> km/h (공식 기준)
         v = wind_speed * 3.6
@@ -80,15 +81,14 @@ class ELTClass :
         wct = 13.12 + 0.6215 * temp - 11.37 * (v ** 0.16) + 0.3965 * temp * (v ** 0.16)
         return round(wct, 1)
 
-
-    def _get_weather_status(self, apparent_temp, month):
-        # 계절별 위험 수위 판단
-        if 10 <= month or month <= 4:  # 겨울
-            if apparent_temp <= -12: 
-                return 'Coldwave Warning'
-            if apparent_temp <= -6: 
-                return 'Coldwave Advisory'
-        
+    # 출처2 : (한파기준온도) https://www.weather.go.kr/w/community/knowledge/standard.do
+    # 현재 접속이 안되고 있음
+    def _get_weather_status(self, min_temp, month):
+        if month >= 10 or month <= 4:  # 겨울
+            if min_temp <= -15:
+                return 'Coldwave Warning'    # 한파 경보
+            if min_temp <= -12:
+                return 'Coldwave Advisory'  # 한파 주의보
         return 'Normal'
     
     def _cleanup_landing_zone(self, files):
